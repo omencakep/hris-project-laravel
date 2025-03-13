@@ -1,0 +1,29 @@
+services:
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: hris_api
+    ports:
+      - "8080:8080"
+    env_file:
+      - .env
+    networks:
+      - hris_network
+    depends_on:
+      - db
+
+  db:
+    image: mariadb:11.6.2
+    container_name: hris_mariadb
+    ports:
+      - "3306:3306"
+    environment:
+      MARIADB_ROOT_PASSWORD: "AMBjKEnXNNZsxAjd31aR@dqxrQARPC!X"
+      MARIADB_DATABASE: "hris_api"
+    networks:
+      - hris_network
+
+networks:
+  hris_network:
+    driver: bridge
