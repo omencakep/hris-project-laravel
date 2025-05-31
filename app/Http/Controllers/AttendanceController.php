@@ -96,4 +96,41 @@ class AttendanceController extends Controller
             'attendance' => $attendance,
         ]);
     }
+
+    // Get absen 3 hari terakhir by employee_id
+    public function recentAttendances()
+    {
+        $user = Auth::user();
+
+        $attendances = Attendance::where('employee_id', $user->id)
+            ->whereDate('date', '>=', now()->subDays(2)->toDateString()) // Hari ini, kemarin, dua hari lalu
+            ->orderBy('date', 'desc')
+            ->get();
+
+        return response()->json([
+            'message' => 'Last 3 days attendance data retrieved.',
+            'attendances' => $attendances,
+        ]);
+    }
+
+    // Get absen hari ini by employee_id
+    public function todayAttendance()
+    {
+        $user = Auth::user();
+
+        $attendance = Attendance::where('employee_id', $user->id)
+            ->whereDate('date', now()->toDateString())
+            ->first();
+
+        if (!$attendance) {
+            return response()->json([
+                'message' => 'No attendance record found for today.',
+            ], 404);
+        }
+
+        return response()->json([
+            'message' => 'Today\'s attendance retrieved.',
+            'attendance' => $attendance,
+        ]);
+    }
 }

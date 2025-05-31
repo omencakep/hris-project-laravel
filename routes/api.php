@@ -21,5 +21,8 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::post('/attendance/check-in', [AttendanceController::class, 'checkIn']);
     Route::post('/attendance/check-out', [AttendanceController::class, 'checkOut']);
 
+    Route::get('/attendance/recent', [AttendanceController::class, 'recentAttendances'])->name('attendance.recent');
+    Route::get('/attendance/today', [AttendanceController::class, 'todayAttendance'])->name('attendance.today');
+
     Route::post('/feedback', [FeedbackController::class, 'submitFeedback']);
 });
