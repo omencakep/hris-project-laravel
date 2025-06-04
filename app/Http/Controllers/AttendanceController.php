@@ -9,6 +9,32 @@ use Illuminate\Support\Facades\Validator;
 
 class AttendanceController extends Controller
 {
+
+    private function saveBase64Image($base64String, $prefix = 'photo')
+    {
+        // Cek dan ambil jenis file dari base64
+        if (preg_match('/^data:image\/(\w+);base64,/', $base64String, $typeMatch)) {
+            $extension = strtolower($typeMatch[1]); // contoh: jpeg, png, webp
+
+            $base64Data = substr($base64String, strpos($base64String, ',') + 1);
+            $image = base64_decode($base64Data);
+
+            $fileName = $prefix . '_' . time() . '_' . uniqid() . '.' . $extension;
+            $filePath = public_path('uploads/attendances/' . $fileName);
+
+            if (!file_exists(dirname($filePath))) {
+                mkdir(dirname($filePath), 0755, true);
+            }
+
+            file_put_contents($filePath, $image);
+
+            return 'uploads/attendances/' . $fileName;
+        }
+
+        return null;
+    }
+
+
     public function checkIn(Request $request)
     {
 
@@ -17,6 +43,7 @@ class AttendanceController extends Controller
         $validator = Validator::make($request->all(), [
             'location_latitude' => 'nullable|numeric',
             'location_longitude' => 'nullable|numeric',
+            'photo' => 'required|string', // base64 photo
         ]);
 
         if ($validator->fails()) {
@@ -24,6 +51,7 @@ class AttendanceController extends Controller
         }
 
         $employeeId = $user->id;
+        $photoPath = $this->saveBase64Image($request->photo, 'checkin');
 
         // Check if already checked in today
         $attendance = Attendance::where('employee_id', $employeeId)
@@ -41,6 +69,7 @@ class AttendanceController extends Controller
             'employee_id' => $employeeId,
             'date' => now()->toDateString(),
             'check_in_time' => now()->toTimeString(),
+            'check_in_photo' => $photoPath,
             'location_latitude' => $request->location_latitude,
             'location_longitude' => $request->location_longitude,
             'status' => 'present',
@@ -60,6 +89,7 @@ class AttendanceController extends Controller
         $validator = Validator::make($request->all(), [
             'location_latitude' => 'nullable|numeric',
             'location_longitude' => 'nullable|numeric',
+            'photo' => 'required|string', // base64 photo
         ]);
 
         if ($validator->fails()) {
@@ -67,6 +97,7 @@ class AttendanceController extends Controller
         }
 
         $employeeId = $user->id;
+        $photoPath = $this->saveBase64Image($request->photo, 'checkout');
 
         $attendance = Attendance::where('employee_id', $employeeId)
             ->where('date', now()->toDateString())
@@ -87,6 +118,7 @@ class AttendanceController extends Controller
 
         $attendance->update([
             'check_out_time' => now()->toTimeString(),
+            'check_out_photo' => $photoPath,
             'location_latitude' => $request->location_latitude ?? $attendance->location_latitude,
             'location_longitude' => $request->location_longitude ?? $attendance->location_longitude,
         ]);
