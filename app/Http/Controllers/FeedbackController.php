@@ -43,7 +43,7 @@ class FeedbackController extends Controller
 
     public function analyze(string $text): ?string
     {
-        $url = 'https://py.hrispoject.online/analyze'; // Endpoint REST API
+        $url = 'https://py.hrisproject.online/analyze'; // Endpoint REST API
 
         $headers = [
             'Content-Type: application/json',
