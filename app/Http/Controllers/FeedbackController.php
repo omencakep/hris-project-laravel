@@ -6,7 +6,6 @@ use App\Models\Feedback;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Validator;
-use Sentiment\SentimentAnalysisClient;
 
 class FeedbackController extends Controller
 {
