@@ -78,4 +78,17 @@ class FeedbackController extends Controller
 
         return $data['sentiment'] ?? null;
     }
+
+    public function countSentiment()
+    {
+        $positiveCount = Feedback::where('sentiment', 'positive')->count();
+        $negativeCount = Feedback::where('sentiment', 'negative')->count();
+        $neutralCount = Feedback::where('sentiment', 'neutral')->count();
+
+        return response()->json([
+            'positive' => $positiveCount,
+            'negative' => $negativeCount,
+            'neutral' => $neutralCount,
+        ]);
+    }
 }

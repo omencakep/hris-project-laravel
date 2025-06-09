@@ -25,4 +25,13 @@ Route::group(['middleware' => ['auth:api']], function () {
     Route::get('/attendance/today', [AttendanceController::class, 'todayAttendance'])->name('attendance.today');
 
     Route::post('/feedback', [FeedbackController::class, 'submitFeedback']);
+    Route::get('/feedback/sentiment-count', [FeedbackController::class, 'countSentiment']);
+
+    Route::get('/office-location', function () {
+        return response()->json([
+            'latitude' => (float) env('OFFICE_LATITUDE'),
+            'longitude' => (float) env('OFFICE_LONGITUDE'),
+            'radius' => (float) env('OFFICE_RADIUS'),
+        ]);
+    });
 });
